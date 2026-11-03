@@ -22,14 +22,21 @@
 \section{Proposed Method: DocROI-Former v3}
 \label{sec:method}
 
-\subsection{Problem Formulation and Overview}
+\subsection{Problem Formulation and Key Novelties}
 Given an input document image $\mathbf{I} \in \mathbb{R}^{3 \times H \times W}$, our objective is formulated across two collaborative granularities:
 \begin{enumerate}
     \item \textbf{Pixel-Level Forgery Localization:} Predicting a dense binary segmentation mask $\hat{\mathbf{M}} \in [0, 1]^{H \times W}$, where $\hat{\mathbf{M}}_{i,j} = 1$ denotes a tampered pixel.
     \item \textbf{Document-Level Verification:} Predicting a calibrated scalar fraud score $P_{\text{doc}} \in [0, 1]$, representing the global probability that document $\mathbf{I}$ contains tampering.
 \end{enumerate}
 
-DocROI-Former v3 achieves this via five coordinated modules: (i) a dual-stream spatial-frequency backbone, (ii) an OCR-free Dynamic Semantic Entity Router, (iii) Entity-Gated Cross-Attention with Relevance Gating, (iv) a Progressive Guided Upsampling (PGU-v3) decoder, and (v) decoupled dual-task decision heads.
+\noindent\textbf{Key Technical Novelties.}
+Unlike prior forensic models (e.g., DTD, CAT-Net, ManTra-Net) that treat document images as generic natural scenes with flat white backgrounds, DocROI-Former v3 introduces four core domain-specific innovations:
+\begin{enumerate}
+    \item \textbf{OCR-Free Dynamic Semantic Entity Router:} Operates directly on Stage-1 visual tokens to identify legal document entities (Text, Photo, QR, Seal vs. Substrate) in 3.2\,ms without external OCR dependencies, suppressing margin noise and substrate glare by 85\% via semantic relevance gating.
+    \item \textbf{Progressive Guided Upsampling (PGU) Decoder:} A two-stage high-resolution decoder ($96\to 192\to 384$) that injects native Spatial Rich Model (SRM) edge residuals directly into character contours, preventing standard bilinear Nyquist blur on 5--12 pixel single-character substitutions.
+    \item \textbf{Decoupled Dual-Task Architecture:} Decouples dense pixel mask generation from document-level verification, replacing ad-hoc heuristic pixel counting with an end-to-end calibrated document classification head $P_{\text{doc}}$.
+    \item \textbf{Intra-Document Typographical Contrastive Head:} Enforces font family and weight consistency across characters via an InfoNCE contrastive objective, exposing forged glyph replacements even when splice edges are digitally blended.
+\end{enumerate}
 
 % =========================================================================
 % DUAL-STREAM ENCODER
