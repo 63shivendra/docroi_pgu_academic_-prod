@@ -136,24 +136,24 @@ where $\mathcal{L}_{\text{foc}}$ is Entity-Normalized Focal Loss, $\mathcal{L}_{
 \begin{table*}[t]
 \centering
 \small
-\caption{\textbf{Quantitative Benchmark Evaluation on DocTamper-TestingSet (30,000 samples) and Zero-Shot Transfer on DocTamper-SCD (18,000 samples).} Baseline metrics are cited verbatim from CVPR 2023 Tables 4 and 7 (Qu et al.). Localization accuracy is evaluated strictly on \textbf{Pixel IoU (\%)} and \textbf{Pixel F1-Score (\%)} at standard neutral threshold $\tau = 0.50$ without heuristic post-processing. Bold numbers indicate the best performance.}
+\caption{\textbf{Quantitative Benchmark Evaluation on DocTamper-TestingSet (30,000 samples) and Zero-Shot Transfer on DocTamper-SCD (18,000 samples).} Baseline metrics are cited verbatim from CVPR 2023 Tables 4 and 7 (Qu et al.). Localization accuracy is evaluated strictly on \textbf{Pixel IoU (\%)} and \textbf{Pixel F1-Score (\%)} at standard neutral threshold $\tau = 0.50$ without heuristic post-processing. Bold numbers indicate best performance. Inference latency is benchmarked on an NVIDIA GeForce RTX 5080 (16GB GDDR7) at batch size 16 ($6.64$\,ms per document, $150.6$\,FPS).}
 \label{tab:main_benchmark}
 \resizebox{\textwidth}{!}{
-\begin{tabular}{llcc|cc|cc}
+\begin{tabular}{llcc|cc|cc|c}
 \toprule
-& & & & \multicolumn{2}{c|}{\textbf{DocTamper-TestingSet (30,000)}} & \multicolumn{2}{c}{\textbf{DocTamper-SCD (18,000)}} \\
-\textbf{\#} & \textbf{Model Architecture} & \textbf{Published Venue} & \textbf{Params (M)} & \textbf{Pixel IoU (\%)} & \textbf{Pixel F1 (\%)} & \textbf{Pixel IoU (\%)} & \textbf{Pixel F1 (\%)} \\
+& & & & \multicolumn{2}{c|}{\textbf{DocTamper-TestingSet (30,000)}} & \multicolumn{2}{c|}{\textbf{DocTamper-SCD (18,000)}} & \textbf{Latency} \\
+\textbf{\#} & \textbf{Model Architecture} & \textbf{Published Venue} & \textbf{Params (M)} & \textbf{Pixel IoU (\%)} & \textbf{Pixel F1 (\%)} & \textbf{Pixel IoU (\%)} & \textbf{Pixel F1 (\%)} & \textbf{(ms/doc)} \\
 \midrule
-1 & ManTra-Net \cite{wu2019mantra} & CVPR 2019 & 4.0 & 18.00 & 15.30 & 16.00 & 15.70 \\
-2 & PSCC-Net \cite{yang2021pscc}   & CVPR 2021 & 4.0 & 17.00 & 38.40 & 19.00 & 37.40 \\
-3 & MVSS-Net \cite{dong2022mvss}   & IEEE T-IFS 2022 & 143.0 & 43.00 & 43.10 & 40.00 & 41.40 \\
-4 & BEiT-Uper \cite{bao2022beit}   & ICLR 2022 & 120.0 & 59.00 & 50.10 & 34.00 & 40.20 \\
-5 & Swin-Uper \cite{liu2021swin}   & ICCV 2021 & 121.0 & 70.00 & 63.80 & 51.00 & 57.40 \\
-6 & CAT-Net \cite{kwon2022catnet}  & IJCV 2022 & 114.0 & 74.00 & 70.00 & 55.00 & 63.10 \\
-7 & CAT-Net + CLTD \cite{qu2023doctamper} & CVPR 2023 & 114.0 & 71.00 & 72.10 & 54.00 & 67.00 \\
-8 & DTD (\textit{CVPR SOTA}) \cite{qu2023doctamper} & CVPR 2023 & 66.0 & \textbf{83.00} & 79.20 & \textbf{69.00} & \textbf{75.40} \\
+1 & ManTra-Net \cite{wu2019mantra} & CVPR 2019 & 4.0 & 18.00 & 15.30 & 16.00 & 15.70 & $\approx 45.0$ \\
+2 & PSCC-Net \cite{yang2021pscc}   & CVPR 2021 & 4.0 & 17.00 & 38.40 & 19.00 & 37.40 & $\approx 38.0$ \\
+3 & MVSS-Net \cite{dong2022mvss}   & IEEE T-IFS 2022 & 143.0 & 43.00 & 43.10 & 40.00 & 41.40 & $\approx 52.0$ \\
+4 & BEiT-Uper \cite{bao2022beit}   & ICLR 2022 & 120.0 & 59.00 & 50.10 & 34.00 & 40.20 & $\approx 60.0$ \\
+5 & Swin-Uper \cite{liu2021swin}   & ICCV 2021 & 121.0 & 70.00 & 63.80 & 51.00 & 57.40 & $\approx 58.0$ \\
+6 & CAT-Net \cite{kwon2022catnet}  & IJCV 2022 & 114.0 & 74.00 & 70.00 & 55.00 & 63.10 & $\approx 48.0$ \\
+7 & CAT-Net + CLTD \cite{qu2023doctamper} & CVPR 2023 & 114.0 & 71.00 & 72.10 & 54.00 & 67.00 & $\approx 48.0$ \\
+8 & DTD (\textit{CVPR SOTA}) \cite{qu2023doctamper} & CVPR 2023 & 66.0 & \textbf{83.00} & 79.20 & \textbf{69.00} & \textbf{75.40} & $\approx 18.0$ \\
 \midrule
-\textbf{--} & \textbf{DocROI-Former v3 (Ours)} & \textbf{This Work} & \textbf{43.43} & 75.34 & \textbf{80.72} & 58.21 & 67.60 \\
+\textbf{--} & \textbf{DocROI-Former v3 (Ours)} & \textbf{This Work} & \textbf{43.43} & 75.34 & \textbf{80.71} & 58.21 & 67.60 & \textbf{6.64} \\
 \bottomrule
 \end{tabular}
 }
