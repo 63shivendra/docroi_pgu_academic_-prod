@@ -53,6 +53,7 @@ def parse_args():
     parser.add_argument("--only_trained", action="store_true", help="Only evaluate testbeds matching training domain (DocTamper and Indian KYC)")
     parser.add_argument("--doctamper_only", action="store_true", help="Only evaluate DocTamper TestingSet and DocTamper SCD")
     parser.add_argument("--datasets", type=str, default="", help="Comma-separated list of datasets to evaluate")
+    parser.add_argument("--jpeg_quality", type=int, default=0, help="Simulate JPEG compression (e.g. 75, 80, 90, 100), 0 for raw uncompressed")
     return parser.parse_args()
 
 
@@ -158,8 +159,8 @@ def evaluate_dataset(
             prob = float(probs[i]) if probs.ndim > 0 else float(probs)
             pred_mask = pred_masks_sig[i, 0]
             tamper_pixels = int((pred_mask >= threshold).sum())
-            has_tamper_evidence = bool(tamper_pixels >= 35)
-            is_tampered_pred = bool((prob >= threshold) or has_tamper_evidence)
+            # Strict CVPR academic protocol: pure neural decision boundary at threshold (tau=0.50)
+            is_tampered_pred = bool(prob >= threshold)
 
             # Confusion classification
             if is_tampered_gt and is_tampered_pred:
@@ -312,12 +313,12 @@ def main():
     # 1. DocTamper TestingSet (30,000 samples)
     dt_test = _find_lmdb("DocTamperV1-TestingSet")
     if dt_test:
-        testbeds.append(("DocTamper_TestingSet", UnifiedDocForensicDataset(lmdb_path=dt_test)))
+        testbeds.append(("DocTamper_TestingSet", UnifiedDocForensicDataset(lmdb_path=dt_test, jpeg_quality=args.jpeg_quality)))
 
     # 2. DocTamper SCD (18,000 samples)
     dt_scd = _find_lmdb("DocTamperV1-SCD")
     if dt_scd:
-        testbeds.append(("DocTamper_SCD", UnifiedDocForensicDataset(lmdb_path=dt_scd)))
+        testbeds.append(("DocTamper_SCD", UnifiedDocForensicDataset(lmdb_path=dt_scd, jpeg_quality=args.jpeg_quality)))
 
     # 3. MIDV-500 Clean International IDs (15,049 samples)
     midv_files = glob.glob(os.path.join(cfg.academic_data_dir, "Midv500", "**", "*.tif"), recursive=True) + \

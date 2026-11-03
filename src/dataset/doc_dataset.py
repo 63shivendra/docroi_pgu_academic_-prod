@@ -47,7 +47,8 @@ class UnifiedDocForensicDataset(Dataset):
         target_size: Tuple[int, int] = (384, 384),
         is_clean_only: bool = False,
         enable_counterfactual: bool = True,
-        counterfactual_ratio: float = 0.35
+        counterfactual_ratio: float = 0.35,
+        jpeg_quality: int = 0
     ):
         super().__init__()
         self.target_size = target_size
@@ -55,6 +56,7 @@ class UnifiedDocForensicDataset(Dataset):
         self.is_clean_only = is_clean_only
         self.enable_counterfactual = enable_counterfactual
         self.counterfactual_ratio = counterfactual_ratio
+        self.jpeg_quality = jpeg_quality
 
         self.tokenizer = OtsuEntityTokenizer()
         self.cf_generator = CounterfactualPairGenerator(target_size=target_size)
@@ -102,13 +104,22 @@ class UnifiedDocForensicDataset(Dataset):
             return len(self.lmdb_keys)
         return len(self.image_paths)
 
+    def _apply_jpeg(self, img_rgb: np.ndarray) -> np.ndarray:
+        if self.jpeg_quality > 0:
+            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), self.jpeg_quality]
+            _, enc = cv2.imencode('.jpg', cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR), encode_param)
+            dec = cv2.imdecode(enc, cv2.IMREAD_COLOR)
+            return cv2.cvtColor(dec, cv2.COLOR_BGR2RGB)
+        return img_rgb
+
     def _load_image(self, path: str) -> np.ndarray:
         img = cv2.imread(path)
         if img is None:
             img = np.zeros((*self.target_size, 3), dtype=np.uint8)
         else:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        return cv2.resize(img, self.target_size)
+        img_resized = cv2.resize(img, self.target_size)
+        return self._apply_jpeg(img_resized)
 
     def _load_mask(self, path: Optional[str]) -> np.ndarray:
         if not path or not os.path.exists(path):
@@ -134,6 +145,7 @@ class UnifiedDocForensicDataset(Dataset):
             img_np = cv2.imdecode(np.frombuffer(img_buf, np.uint8), cv2.IMREAD_COLOR)
             img_np = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
             img_np = cv2.resize(img_np, self.target_size)
+            img_np = self._apply_jpeg(img_np)
 
             if mask_buf:
                 m_np = cv2.imdecode(np.frombuffer(mask_buf, np.uint8), cv2.IMREAD_GRAYSCALE)
