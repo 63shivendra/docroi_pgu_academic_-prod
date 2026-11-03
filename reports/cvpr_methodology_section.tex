@@ -1,0 +1,108 @@
+% =========================================================================
+% DocROI-Former v3: CVPR / IEEE T-IFS Formal Methodology Section
+% =========================================================================
+
+\section{Proposed Method: DocROI-Former v3}
+\label{sec:method}
+
+\subsection{Problem Formulation and Overview}
+Given an input document image $\mathbf{I} \in \mathbb{R}^{3 \times H \times W}$, our objective is formulated across two collaborative granularities:
+\begin{enumerate}
+    \item \textbf{Pixel-Level Forgery Localization:} Predicting a dense binary segmentation mask $\hat{\mathbf{M}} \in [0, 1]^{H \times W}$, where $\hat{\mathbf{M}}_{i,j} = 1$ denotes a tampered pixel.
+    \item \textbf{Document-Level Verification:} Predicting a calibrated scalar fraud score $P_{\text{doc}} \in [0, 1]$, representing the global probability that document $\mathbf{I}$ contains tampering.
+\end{enumerate}
+
+DocROI-Former v3 achieves this via five coordinated modules: (i) a dual-stream spatial-frequency backbone, (ii) an OCR-free Dynamic Semantic Entity Router, (iii) Entity-Gated Cross-Attention with Relevance Gating, (iv) a Progressive Guided Upsampling (PGU-v3) decoder, and (v) decoupled dual-task decision heads.
+
+% =========================================================================
+% DUAL-STREAM ENCODER
+% =========================================================================
+\subsection{Dual-Stream Spatial-Frequency Feature Pyramid}
+\label{subsec:dual_stream}
+
+\noindent\textbf{Spatial Visual Stream.} 
+To capture global typographical layout and semantic context, $\mathbf{I}$ is processed by a hierarchical Pyramid Vision Transformer (PVTv2-B2), generating a four-stage spatial feature pyramid:
+\begin{equation}
+    \{\mathbf{F}_{\text{spat}}^{(i)}\}_{i=1}^4, \quad \mathbf{F}_{\text{spat}}^{(i)} \in \mathbb{R}^{C_i \times \frac{H}{2^{i+1}} \times \frac{W}{2^{i+1}}},
+\end{equation}
+where $C \in \{64, 128, 320, 512\}$ at spatial strides $\{4, 8, 16, 32\}$.
+
+\noindent\textbf{Frequency Forensic Stream.} 
+In parallel, high-frequency tampering traces and compression grid shifts are extracted via a three-tier front-end:
+\begin{enumerate}
+    \item \textit{Bayar Constrained Convolution:} Enforces adaptive prediction error filtering via constrained zero-sum kernel weights:
+    \begin{equation}
+        \sum_{(u,v) \neq (0,0)} \mathbf{W}_{\text{bayar}}(u, v) = 1.0, \quad \mathbf{W}_{\text{bayar}}(0, 0) = -1.0.
+    \end{equation}
+    \item \textit{Spatial Rich Model (SRM):} Employs three fixed high-pass filter banks to isolate physical splice edge boundaries.
+    \item \textit{Fast 8$\times$8 Block-DCT Stream:} Evaluates 64 orthogonal 2D-DCT-II basis filters over non-overlapping $8 \times 8$ blocks to detect JPEG quantization grid misalignments.
+\end{enumerate}
+The unified residual stream is projected through a convolutional pyramid matching the exact spatial strides and channel dimensions of the spatial stream:
+\begin{equation}
+    \{\mathbf{F}_{\text{freq}}^{(i)}\}_{i=1}^4, \quad \mathbf{F}_{\text{freq}}^{(i)} \in \mathbb{R}^{C_i \times \frac{H}{2^{i+1}} \times \frac{W}{2^{i+1}}}.
+\end{equation}
+
+% =========================================================================
+% ENTITY ROUTER & RELEVANCE GATING
+% =========================================================================
+\subsection{Dynamic Semantic Entity Router and Relevance Gating}
+\label{subsec:entity_router}
+
+Document forgery typically targets foreground entities (names, numbers, seals) rather than uninformative margins.
+
+\noindent\textbf{Entity Token Router.}
+Stage-1 spatial features $\mathbf{F}_{\text{spat}}^{(1)}$ are classified into $K=5$ semantic legal categories (Paper Substrate, Text/Digits, Photo Box, QR Code, and Official Seal):
+\begin{equation}
+    \mathbf{Z}_{\text{ent}} = \text{Conv}_{1 \times 1}\Big(\text{GELU}\big(\text{BN}(\text{Conv}_{3 \times 3}(\mathbf{F}_{\text{spat}}^{(1)}))\big)\Big) \in \mathbb{R}^{5 \times \frac{H}{4} \times \frac{W}{4}}.
+\end{equation}
+A continuous relevance map $\mathbf{W}_{\text{rel}} \in [0, 1]^{\frac{H}{4} \times \frac{W}{4}}$ is projected from $\mathbf{Z}_{\text{ent}}$ via a sigmoid convolution.
+
+\noindent\textbf{Semantic Relevance Gating.}
+To prevent harmless paper folds, creases, and margin lighting from triggering false alarms, frequency features at each stage $i$ are modulated:
+\begin{equation}
+    \tilde{\mathbf{F}}_{\text{freq}}^{(i)} = \mathbf{F}_{\text{freq}}^{(i)} \odot \Big(\alpha + (1 - \alpha) \cdot \text{Resize}(\mathbf{W}_{\text{rel}})\Big) \odot \sigma\Big(\text{Proj}(\mathbf{F}_{\text{freq}}^{(i)})\Big),
+\end{equation}
+where $\alpha = 0.15$ guarantees global gradient flow while attenuating inert background noise by $85\%$.
+
+\noindent\textbf{Entity-Gated Cross-Attention.}
+Spatial features serve as queries $\mathbf{Q} = \mathbf{F}_{\text{spat}}^{(i)} \mathbf{W}_Q$, while gated frequency features serve as keys $\mathbf{K} = \tilde{\mathbf{F}}_{\text{freq}}^{(i)} \mathbf{W}_K$ and values $\mathbf{V} = \tilde{\mathbf{F}}_{\text{freq}}^{(i)} \mathbf{W}_V$. Spatial Reduction Attention (SRA) with ratio $R \in \{4, 2, 1, 1\}$ reduces key/value dimensions to achieve linear complexity $\mathcal{O}(N \cdot \frac{N}{R^2})$. Background keys corresponding to paper substrate ($\mathbf{Z}_{\text{ent}} = 0$) receive a soft attenuation bias of $-4.0$ prior to softmax:
+\begin{equation}
+    \mathbf{A} = \text{Softmax}\left( \frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{d_k}} + \mathbf{M}_{\text{bg}} \right) \mathbf{V}, \quad \mathbf{M}_{\text{bg}}(u, v) = \begin{cases} 0.0 & \text{if Entity} \\ -4.0 & \text{if Paper Substrate} \end{cases}
+\end{equation}
+The attended representation is concatenated with $\mathbf{F}_{\text{spat}}^{(i)}$ and fused via a $3 \times 3$ convolution to yield fused stage features $\mathbf{F}_{\text{fused}}^{(i)}$.
+
+% =========================================================================
+% PGU DECODER
+% =========================================================================
+\subsection{Progressive Guided Upsampling (PGU) Decoder}
+\label{subsec:pgu_decoder}
+
+Single-character alterations in documents (e.g., in dates or account numbers) often span only $5$--$12$ pixels at standard resolution. Conventional bilinear upsampling introduces severe Nyquist blur across fine character strokes. We resolve this via a two-stage Progressive Guided Upsampling (PGU) decoder:
+\begin{itemize}
+    \item \textbf{Stage A ($96 \times 96 \to 192 \times 192$, Stride 2):} Fused multi-scale features are projected to 256 channels at stride 4, concatenated, and upscaled to $192 \times 192$. High-resolution Stage-1 spatial skip tokens are fused via Depthwise-Separable Convolutions. An auxiliary boundary segmentation head $\mathbf{M}_{\text{aux}}$ operates here for deep boundary supervision during training.
+    \item \textbf{Stage B ($192 \times 192 \to 384 \times 384$, Stride 1):} Features are upscaled to native image resolution ($384 \times 384$) and dynamically refined by injecting native SRM high-pass residuals $\mathbf{R}_{\text{srm}} \in \mathbb{R}^{3 \times H \times W}$ through a learned gating layer:
+    \begin{equation}
+        \mathbf{F}_{\text{final}} = \mathbf{F}_B + \tanh\Big(\text{Conv}_{1 \times 1}(\mathbf{F}_B)\Big) \odot \text{Proj}(\mathbf{R}_{\text{srm}}).
+    \end{equation}
+    A final $3 \times 3 \to 1 \times 1$ convolutional predictor outputs dense mask logits. To stabilize early convergence under extreme foreground sparsity, the final layer bias is initialized to $-2.19$ ($\pi \approx 0.10$).
+\end{itemize}
+
+% =========================================================================
+% DECOUPLED HEADS & LOSS
+% =========================================================================
+\subsection{Decoupled Decision Heads and Multi-Task Objective}
+\label{subsec:heads_and_loss}
+
+\noindent\textbf{Decoupled Document Classification Head.} 
+Rather than relying on heuristic pixel counting to infer document tampering, a dedicated classification head pools Stage-4 spatial and frequency features via Global Average Pooling (GAP) and Global Max Pooling (GMP), followed by an MLP to output calibrated document probability $P_{\text{doc}} = \sigma(\text{MLP}([\text{GAP}; \text{GMP}]))$.
+
+\noindent\textbf{Intra-Document Font Contrastive Head.}
+Character tokens from Stage-1 features are projected into a 128-dimensional typographical embedding space and optimized via an InfoNCE contrastive loss over sampled character pairs, pulling genuine intra-document fonts together while pushing manipulated characters apart.
+
+\noindent\textbf{Total Multi-Task Loss.}
+The model is trained end-to-end under a unified multi-task objective:
+\begin{equation}
+    \mathcal{L}_{\text{total}} = \lambda_{\text{foc}} \mathcal{L}_{\text{foc}} + \lambda_{\text{dice}} \mathcal{L}_{\text{dice}} + \lambda_{\text{bnd}} \mathcal{L}_{\text{bnd}} + \lambda_{\text{aux}} \mathcal{L}_{\text{aux}} + \lambda_{\text{font}} \mathcal{L}_{\text{font}} + \lambda_{\text{glob}} \mathcal{L}_{\text{glob}},
+\end{equation}
+where $\mathcal{L}_{\text{foc}}$ is Entity-Normalized Focal Loss, $\mathcal{L}_{\text{dice}}$ is Dice loss, $\mathcal{L}_{\text{bnd}}$ is Boundary Signed Distance loss, $\mathcal{L}_{\text{aux}}$ supervises Stage A, $\mathcal{L}_{\text{font}}$ is InfoNCE typographical loss, and $\mathcal{L}_{\text{glob}}$ is class-balanced document binary cross-entropy. Weights are set to $\lambda = \{0.30, 0.40, 0.20, 0.35, 0.10, 0.30\}$.
+

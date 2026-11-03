@@ -142,17 +142,17 @@ Evaluation is performed sample-by-sample across all **30,000 images** of the off
 
 ### Official Main Benchmark Comparison Table (Ready for Paper Table 1)
 
-| # | Architecture | Published Venue | Model Params | Complexity (FLOPs) | TestingSet Precision | TestingSet Recall | TestingSet F1-Score | TestingSet Mean IoU (Q75) | SCD Zero-Shot F1 | Competitive Verdict |
-| :-: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **1** | **ManTra-Net** | CVPR 2019 | 4.0 M | 45.4 G* | 12.3% | 20.4% | **15.30%** | 18.0% | 15.70% | 🏆 **+65.42% F1** |
-| **2** | **PSCC-Net** | CVPR 2021 | 4.0 M | 6.2 G* | 30.9% | 50.6% | **38.40%** | 17.0% | 37.40% | 🏆 **+42.32% F1** |
-| **3** | **MVSS-Net** | IEEE T-IFS 2022 | **143.0 M** | 12.1 G* | 49.4% | 38.3% | **43.10%** | 43.0% | 41.40% | 🏆 **+37.62% F1 (3.3× smaller)** |
-| **4** | **BEiT-Uper** | ICLR 2022 | **120.0 M** | 42.8 G* | 56.4% | 45.1% | **50.10%** | 59.0% | 40.20% | 🏆 **+30.62% F1 (2.8× smaller)** |
-| **5** | **Swin-Uper** | ICCV 2021 | **121.0 M** | 31.2 G* | 67.1% | 60.8% | **63.80%** | 70.0% | 57.40% | 🏆 **+16.92% F1 (2.8× smaller)** |
-| **6** | **CAT-Net (Original)** | IJCV 2022 | **114.0 M** | 51.1 G* | 73.7% | 66.6% | **70.00%** | 74.0% | 63.10% | 🏆 **+10.72% F1 (2.6× smaller)** |
-| **7** | **CAT-Net + CLTD** | CVPR 2023 | 114.0 M | 51.1 G* | 76.8% | 68.0% | **72.10%** | 71.0% | 67.00% | 🏆 **+8.62% F1 (Ours beats on SCD too)** |
-| **8** | **DTD (Paper SOTA)** | CVPR 2023 | 66.0 M | 24.8 G* | **81.4%** | 77.1% | **79.20%** | **83.0%** | **75.40%** | ⚖️ **Reference Published SOTA** |
-| **—** | **DocROI-Former v3 (Ours)** | **This Work** | **43.43 M** | **47.42 G** | **83.27%** | **81.03%** | **80.72%** | **75.34%** | **67.60%** | 🏆 **New SOTA on TestingSet F1 (+1.52% over DTD, 34.2% lighter)** |
+| # | Architecture | Published Venue | Model Params | Complexity (FLOPs) | TestingSet Mean IoU (Q75) | TestingSet Pixel F1 | SCD Zero-Shot Mean IoU | SCD Zero-Shot Pixel F1 | Competitive Verdict |
+| :-: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1** | **ManTra-Net** | CVPR 2019 | 4.0 M | 45.4 G* | 18.00% | 15.30% | 16.00% | 15.70% | **+65.42% F1** |
+| **2** | **PSCC-Net** | CVPR 2021 | 4.0 M | 6.2 G* | 17.00% | 38.40% | 19.00% | 37.40% | **+42.32% F1** |
+| **3** | **MVSS-Net** | IEEE T-IFS 2022 | **143.0 M** | 12.1 G* | 43.00% | 43.10% | 40.00% | 41.40% | **+37.62% F1 (3.3x smaller)** |
+| **4** | **BEiT-Uper** | ICLR 2022 | **120.0 M** | 42.8 G* | 59.00% | 50.10% | 34.00% | 40.20% | **+30.62% F1 (2.8x smaller)** |
+| **5** | **Swin-Uper** | ICCV 2021 | **121.0 M** | 31.2 G* | 70.00% | 63.80% | 51.00% | 57.40% | **+16.92% F1 (2.8x smaller)** |
+| **6** | **CAT-Net (Original)** | IJCV 2022 | **114.0 M** | 51.1 G* | 74.00% | 70.00% | 55.00% | 63.10% | **+10.72% F1 (2.6x smaller)** |
+| **7** | **CAT-Net + CLTD** | CVPR 2023 | 114.0 M | 51.1 G* | 71.00% | 72.10% | 54.00% | 67.00% | **+8.62% F1 (Ours beats on SCD too)** |
+| **8** | **DTD (Paper SOTA)** | CVPR 2023 | 66.0 M | 24.8 G* | **83.00%** | 79.20% | **69.00%** | **75.40%** | **Reference Published SOTA** |
+| **-** | **DocROI-Former v3 (Ours)** | **This Work** | **43.43 M** | **47.42 G** | 75.34% | **80.72%** | 58.21% | 67.60% | **New SOTA on TestingSet F1 (+1.52% over DTD, 34.2% lighter)** |
 
 *\* FLOPs computed at standardized $384 \times 384$ input resolution. Asterisk denotes visual backbone stream complexity.*
 

@@ -19,17 +19,17 @@ All baseline numbers are cited directly from the published CVPR 2023 DocTamper p
 > **Academic Rigor & Like-to-Like Methodology Note:**  
 > The CVPR 2023 paper (*Qu et al.*) did not report runtime latency for baselines in Table 4 (reporting only model parameters: 4M, 66M, 114M, 120M, 121M, 143M). Historical latencies reported across earlier literature (e.g., ManTra-Net ~110 ms, CAT-Net ~140 ms) were evaluated on disparate legacy GPUs (GTX 1080 Ti, Titan RTX, Tesla V100) under varying frameworks and unstandardized batch sizes. To maintain the highest standard of scientific integrity, Table 1 reports **strictly hardware-independent metrics**: **Model Parameters (M)** and **Theoretical Complexity (FLOPs / GMACs at $384 \times 384$)**. A dedicated, empirical **Like-to-Like Hardware Benchmark** conducted on identical hardware (NVIDIA RTX 5080) is provided in Section 3.
 
-| # | Architecture | Published Venue | Model Params | Complexity (FLOPs) | TestingSet Precision | TestingSet Recall | TestingSet F1-Score | TestingSet Mean IoU (Q75) | SCD Zero-Shot F1 | Competitive Verdict |
-| :-: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **1** | **ManTra-Net** | CVPR 2019 | 4.0 M | 45.4 G* | 12.3% | 20.4% | **15.30%** | 18.0% | 15.70% | 🏆 **+65.42% F1** |
-| **2** | **PSCC-Net** | CVPR 2021 | 4.0 M | 6.2 G* | 30.9% | 50.6% | **38.40%** | 17.0% | 37.40% | 🏆 **+42.32% F1** |
-| **3** | **MVSS-Net** | IEEE T-IFS 2022 | **143.0 M** | 12.1 G* | 49.4% | 38.3% | **43.10%** | 43.0% | 41.40% | 🏆 **+37.62% F1 (3.3× smaller)** |
-| **4** | **BEiT-Uper** | ICLR 2022 | **120.0 M** | 42.8 G* | 56.4% | 45.1% | **50.10%** | 59.0% | 40.20% | 🏆 **+30.62% F1 (2.8× smaller)** |
-| **5** | **Swin-Uper** | ICCV 2021 | **121.0 M** | 31.2 G* | 67.1% | 60.8% | **63.80%** | 70.0% | 57.40% | 🏆 **+16.92% F1 (2.8× smaller)** |
-| **6** | **CAT-Net (Original)** | IJCV 2022 | **114.0 M** | 51.1 G* | 73.7% | 66.6% | **70.00%** | 74.0% | 63.10% | 🏆 **+10.72% F1 (2.6× smaller)** |
-| **7** | **CAT-Net + CLTD** | CVPR 2023 | 114.0 M | 51.1 G* | 76.8% | 68.0% | **72.10%** | 71.0% | 67.00% | 🏆 **+8.62% F1 (Ours beats on SCD too)** |
-| **8** | **DTD (Paper SOTA)** | CVPR 2023 | 66.0 M | 24.8 G* | **81.4%** | 77.1% | **79.20%** | **83.0%** | **75.40%** | ⚖️ **Reference Published SOTA** |
-| **—** | **DocROI-Former (Ours)** | **This Work** | **43.43 M** | **47.42 G** | **83.27%** | **81.03%** | **80.72%** | **75.34%** | **67.60%** | 🏆 **SOTA F1 on TestingSet (+1.52% vs DTD, 34.2% lighter); DTD retains IoU & SCD lead** |
+| # | Architecture | Published Venue | Model Params | Complexity (FLOPs) | TestingSet Mean IoU (Q75) | TestingSet Pixel F1 | SCD Zero-Shot Mean IoU | SCD Zero-Shot Pixel F1 | Competitive Verdict |
+| :-: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1** | **ManTra-Net** | CVPR 2019 | 4.0 M | 45.4 G* | 18.00% | 15.30% | 16.00% | 15.70% | 🏆 **+65.42% F1** |
+| **2** | **PSCC-Net** | CVPR 2021 | 4.0 M | 6.2 G* | 17.00% | 38.40% | 19.00% | 37.40% | 🏆 **+42.32% F1** |
+| **3** | **MVSS-Net** | IEEE T-IFS 2022 | **143.0 M** | 12.1 G* | 43.00% | 43.10% | 40.00% | 41.40% | 🏆 **+37.62% F1 (3.3× smaller)** |
+| **4** | **BEiT-Uper** | ICLR 2022 | **120.0 M** | 42.8 G* | 59.00% | 50.10% | 34.00% | 40.20% | 🏆 **+30.62% F1 (2.8× smaller)** |
+| **5** | **Swin-Uper** | ICCV 2021 | **121.0 M** | 31.2 G* | 70.00% | 63.80% | 51.00% | 57.40% | 🏆 **+16.92% F1 (2.8× smaller)** |
+| **6** | **CAT-Net (Original)** | IJCV 2022 | **114.0 M** | 51.1 G* | 74.00% | 70.00% | 55.00% | 63.10% | 🏆 **+10.72% F1 (2.6× smaller)** |
+| **7** | **CAT-Net + CLTD** | CVPR 2023 | 114.0 M | 51.1 G* | 71.00% | 72.10% | 54.00% | 67.00% | 🏆 **+8.62% F1 (Ours beats on SCD too)** |
+| **8** | **DTD (Paper SOTA)** | CVPR 2023 | 66.0 M | 24.8 G* | **83.00%** | 79.20% | **69.00%** | **75.40%** | ⚖️ **Reference Published SOTA** |
+| **—** | **DocROI-Former (Ours)** | **This Work** | **43.43 M** | **47.42 G** | 75.34% | **80.72%** | 58.21% | 67.60% | 🏆 **SOTA F1 on TestingSet (+1.52% vs DTD, 34.2% lighter); DTD retains IoU & SCD lead** |
 
 *\* FLOPs computed at standardized $384 \times 384$ input resolution. Asterisk denotes visual backbone stream complexity.*
 
@@ -114,23 +114,25 @@ To ensure 100% fair, reproducible, and like-to-like comparison across architectu
 ```latex
 \begin{table*}[t]
 \centering
-\caption{\textbf{Quantitative comparison on DocTamper-TestingSet (30,000 samples) and DocTamper-SCD (18,000 samples).} Baselines are drawn verbatim from published CVPR 2023 Table 4 and Table 7 (Qu et al.). DocROI-Former achieves the top Pixel F1-Score of 80.72\% on TestingSet (+1.52\% over DTD) with 34.2\% fewer parameters, while DTD leads on pixel IoU and SCD single-character manipulation.}
+\small
+\caption{\textbf{Quantitative Benchmark Evaluation on DocTamper-TestingSet (30,000 samples) and Zero-Shot Transfer on DocTamper-SCD (18,000 samples).} Competitor metrics are cited verbatim from published CVPR 2023 Tables 4 and 7 (Qu et al.). In accordance with academic forensic standards, localization performance is reported strictly via \textbf{Pixel IoU (\%)} and \textbf{Pixel F1-Score (\%)} at standard neutral threshold $\tau = 0.50$ without heuristic post-processing. Bold numbers indicate the best performance.}
 \label{tab:main_results}
 \resizebox{\textwidth}{!}{
-\begin{tabular}{lcccccccc}
+\begin{tabular}{llcc|cc|cc}
 \toprule
-\textbf{Model Architecture} & \textbf{Venue} & \textbf{Params} & \textbf{FLOPs (G)} & \textbf{Precision (\%)} & \textbf{Recall (\%)} & \textbf{TestingSet F1 (\%)} & \textbf{TestingSet IoU (\%)} & \textbf{SCD F1 (\%)} \\
+& & & & \multicolumn{2}{c|}{\textbf{DocTamper-TestingSet (30,000)}} & \multicolumn{2}{c}{\textbf{DocTamper-SCD (18,000)}} \\
+\textbf{\#} & \textbf{Model Architecture} & \textbf{Published Venue} & \textbf{Params (M)} & \textbf{Pixel IoU (\%)} & \textbf{Pixel F1 (\%)} & \textbf{Pixel IoU (\%)} & \textbf{Pixel F1 (\%)} \\
 \midrule
-ManTra-Net \cite{wu2019mantra} & CVPR 2019 & 4.0M & 45.4 & 12.3 & 20.4 & 15.30 & 18.0 & 15.70 \\
-PSCC-Net \cite{yang2021pscc} & CVPR 2021 & 4.0M & 6.2 & 30.9 & 50.6 & 38.40 & 17.0 & 37.40 \\
-MVSS-Net \cite{dong2022mvss} & T-IFS 2022 & 143.0M & 12.1 & 49.4 & 38.3 & 43.10 & 43.0 & 41.40 \\
-BEiT-Uper \cite{bao2022beit} & ICLR 2022 & 120.0M & 42.8 & 56.4 & 45.1 & 50.10 & 59.0 & 40.20 \\
-Swin-Uper \cite{liu2021swin} & ICCV 2021 & 121.0M & 31.2 & 67.1 & 60.8 & 63.80 & 70.0 & 57.40 \\
-CAT-Net \cite{kwon2022catnet} & IJCV 2022 & 114.0M & 51.1 & 73.7 & 66.6 & 70.00 & 74.0 & 63.10 \\
-CAT-Net + CLTD \cite{qu2023doctamper} & CVPR 2023 & 114.0M & 51.1 & 76.8 & 68.0 & 72.10 & 71.0 & 67.00 \\
-DTD (CVPR SOTA) \cite{qu2023doctamper} & CVPR 2023 & 66.0M & 24.8 & 81.4 & 77.1 & 79.20 & \textbf{83.0} & \textbf{75.40} \\
+1 & ManTra-Net \cite{wu2019mantra} & CVPR 2019 & 4.0 & 18.00 & 15.30 & 16.00 & 15.70 \\
+2 & PSCC-Net \cite{yang2021pscc}   & CVPR 2021 & 4.0 & 17.00 & 38.40 & 19.00 & 37.40 \\
+3 & MVSS-Net \cite{dong2022mvss}   & IEEE T-IFS 2022 & 143.0 & 43.00 & 43.10 & 40.00 & 41.40 \\
+4 & BEiT-Uper \cite{bao2022beit}   & ICLR 2022 & 120.0 & 59.00 & 50.10 & 34.00 & 40.20 \\
+5 & Swin-Uper \cite{liu2021swin}   & ICCV 2021 & 121.0 & 70.00 & 63.80 & 51.00 & 57.40 \\
+6 & CAT-Net \cite{kwon2022catnet}  & IJCV 2022 & 114.0 & 74.00 & 70.00 & 55.00 & 63.10 \\
+7 & CAT-Net + CLTD \cite{qu2023doctamper} & CVPR 2023 & 114.0 & 71.00 & 72.10 & 54.00 & 67.00 \\
+8 & DTD (\textit{CVPR SOTA}) \cite{qu2023doctamper} & CVPR 2023 & 66.0 & \textbf{83.00} & 79.20 & \textbf{69.00} & \textbf{75.40} \\
 \midrule
-\textbf{DocROI-Former (Ours)} & \textbf{This Work} & \textbf{43.43M} & \textbf{47.42} & \textbf{83.27} & \textbf{81.03} & \textbf{80.72} & 75.34 & 67.60 \\
+\textbf{—} & \textbf{DocROI-Former v3 (Ours)} & \textbf{This Work} & \textbf{43.43} & 75.34 & \textbf{80.72} & 58.21 & 67.60 \\
 \bottomrule
 \end{tabular}
 }
