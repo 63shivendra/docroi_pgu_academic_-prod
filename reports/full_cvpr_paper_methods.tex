@@ -1,6 +1,6 @@
 \documentclass[10pt,twocolumn,letterpaper]{article}
 
-% Required packages for math, symbols, and professional tables
+% Required packages for math symbols, formatting, and tables
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -129,8 +129,9 @@ where $\mathcal{L}_{\text{foc}}$ is Entity-Normalized Focal Loss, $\mathcal{L}_{
 \begin{table*}[t]
 \centering
 \small
-\caption{\textbf{Quantitative Benchmark Evaluation on DocTamper-TestingSet (30,000 samples) and Zero-Shot Transfer on DocTamper-SCD (18,000 samples).} Competitor metrics are cited verbatim from published CVPR 2023 Tables 4 and 7 (Qu et al.). In accordance with academic forensic standards, localization performance is evaluated strictly on \textbf{Pixel IoU (\%)} and \textbf{Pixel F1-Score (\%)} at neutral threshold $\tau = 0.50$ without heuristic post-processing. Bold numbers indicate the best performance.}
+\caption{\textbf{Quantitative Benchmark Evaluation on DocTamper-TestingSet (30,000 samples) and Zero-Shot Transfer on DocTamper-SCD (18,000 samples).} Baseline metrics are cited verbatim from CVPR 2023 Tables 4 and 7 (Qu et al.). Localization accuracy is evaluated strictly on \textbf{Pixel IoU (\%)} and \textbf{Pixel F1-Score (\%)} at standard neutral threshold $\tau = 0.50$ without heuristic post-processing. Bold numbers indicate the best performance.}
 \label{tab:main_benchmark}
+\resizebox{\textwidth}{!}{
 \begin{tabular}{llcc|cc|cc}
 \toprule
 & & & & \multicolumn{2}{c|}{\textbf{DocTamper-TestingSet (30,000)}} & \multicolumn{2}{c}{\textbf{DocTamper-SCD (18,000)}} \\
@@ -145,10 +146,52 @@ where $\mathcal{L}_{\text{foc}}$ is Entity-Normalized Focal Loss, $\mathcal{L}_{
 7 & CAT-Net + CLTD \cite{qu2023doctamper} & CVPR 2023 & 114.0 & 71.00 & 72.10 & 54.00 & 67.00 \\
 8 & DTD (\textit{CVPR SOTA}) \cite{qu2023doctamper} & CVPR 2023 & 66.0 & \textbf{83.00} & 79.20 & \textbf{69.00} & \textbf{75.40} \\
 \midrule
-\textbf{—} & \textbf{DocROI-Former v3 (Ours)} & \textbf{This Work} & \textbf{43.43} & 75.34 & \textbf{80.72} & 58.21 & 67.60 \\
+\textbf{--} & \textbf{DocROI-Former v3 (Ours)} & \textbf{This Work} & \textbf{43.43} & 75.34 & \textbf{80.72} & 58.21 & 67.60 \\
 \bottomrule
 \end{tabular}
+}
 \end{table*}
 
-\end{document}
+% =========================================================================
+% REFERENCES (SELF-CONTAINED)
+% =========================================================================
+\begin{thebibliography}{99}
 
+\bibitem{wu2019mantra}
+Y.~Wu, N.~AbdAlmageed, and P.~Natarajan.
+\newblock Mantra-net: Manipulation tracing network for detection and localization of image forgeries with anomalous features.
+\newblock In \emph{IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, pages 9543--9552, 2019.
+
+\bibitem{yang2021pscc}
+X.~Yang, C.~Li, Y.~Rao, and J.~Ni.
+\newblock Constrained progressive spatio-channel correlation network for image manipulation detection.
+\newblock In \emph{IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, pages 8896--8905, 2021.
+
+\bibitem{dong2022mvss}
+C.~Dong, X.~Chen, R.~Hu, J.~Cao, and X.~Li.
+\newblock Mvss-net: Multi-view multi-scale supervised networks for image manipulation detection.
+\newblock \emph{IEEE Trans. Inf. Forensics Secur. (T-IFS)}, 17:3539--3553, 2022.
+
+\bibitem{bao2022beit}
+H.~Bao, L.~Dong, S.~Piao, and F.~Wei.
+\newblock Beit: Bert pre-training of image transformers.
+\newblock In \emph{Int. Conf. Learn. Represent. (ICLR)}, 2022.
+
+\bibitem{liu2021swin}
+Z.~Liu, Y.~Lin, Y.~Cao, H.~Hu, Y.~Wei, Z.~Zhang, S.~Lin, and B.~Guo.
+\newblock Swin transformer: Hierarchical vision transformer using shifted windows.
+\newblock In \emph{IEEE/CVF Int. Conf. Comput. Vis. (ICCV)}, pages 10012--10022, 2021.
+
+\bibitem{kwon2022catnet}
+M.-J. Kwon, I.-J. Yu, S.-H. Nam, and H.-K. Lee.
+\newblock Cat-net: Compression artifact tracing network for detecting and localizing image splices.
+\newblock \emph{Int. J. Comput. Vis. (IJCV)}, 130(8):1885--1908, 2022.
+
+\bibitem{qu2023doctamper}
+C.~Qu, S.~Tan, C.~Shen, X.~Chen, K.~Yin, Y.~Shen, and P.~Luo.
+\newblock Towards robust tampered text detection in document image: New dataset and new solution.
+\newblock In \emph{IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR)}, pages 5937--5946, 2023.
+
+\end{thebibliography}
+
+\end{document}
